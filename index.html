@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AI Resume SaaS</title>
+<title>AI Resume SaaS Pro</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -13,7 +13,7 @@
 
 <style>
 
-/* ===== BASIC UI ===== */
+/* ===== BASE ===== */
 body{
 margin:0;
 font-family:Poppins;
@@ -21,13 +21,16 @@ background:#0f172a;
 color:white;
 }
 
+/* NAV */
 nav{
 display:flex;
 justify-content:space-between;
 padding:15px 30px;
 background:rgba(255,255,255,0.05);
+backdrop-filter:blur(10px);
 }
 
+/* BUTTON */
 button{
 padding:10px 20px;
 border:none;
@@ -37,14 +40,40 @@ background:#ff4da6;
 color:white;
 }
 
-/* LOGIN */
+/* LOGIN BOX FIX */
 #loginBox{
 max-width:400px;
 margin:100px auto;
 padding:30px;
-background:rgba(255,255,255,0.05);
+background:rgba(255,255,255,0.08);
 border-radius:15px;
 text-align:center;
+backdrop-filter:blur(10px);
+box-shadow:0 0 20px rgba(255,255,255,0.1);
+position:relative;
+z-index:1;
+}
+
+/* INPUT FIX (MAIN BUG FIX) */
+#loginBox input{
+width:90%;
+padding:12px;
+margin:10px 0;
+border-radius:10px;
+border:none;
+outline:none;
+background:#1e293b;
+color:white;
+font-size:16px;
+position:relative;
+z-index:10;
+pointer-events:auto;
+}
+
+#loginBox input:focus{
+border:2px solid #ff4da6;
+transform:scale(1.02);
+transition:0.2s;
 }
 
 /* DASHBOARD */
@@ -53,15 +82,19 @@ display:none;
 padding:20px;
 }
 
+/* CARD */
 .card{
 background:rgba(255,255,255,0.05);
 padding:20px;
 margin:20px 0;
 border-radius:15px;
+backdrop-filter:blur(10px);
 }
 
-/* UPLOAD */
-input[type=file]{display:none;}
+/* FILE INPUT */
+input[type=file]{
+display:none;
+}
 
 label{
 padding:12px 20px;
@@ -69,6 +102,16 @@ border:2px dashed #ff4da6;
 display:inline-block;
 cursor:pointer;
 margin-bottom:10px;
+border-radius:10px;
+}
+
+#loading{
+margin-top:10px;
+color:#00ffee;
+}
+
+#result{
+white-space:pre-wrap;
 }
 
 </style>
@@ -79,10 +122,8 @@ margin-bottom:10px;
 
 <!-- NAV -->
 <nav>
-<div>🤖 AI SaaS</div>
-<div>
+<div>🤖 AI SaaS Pro</div>
 <button onclick="logout()">Logout</button>
-</div>
 </nav>
 
 <!-- LOGIN -->
@@ -90,8 +131,10 @@ margin-bottom:10px;
 
 <h2>Login</h2>
 
-<input id="email" placeholder="Email"><br><br>
-<input id="pass" type="password" placeholder="Password"><br><br>
+<input id="email" type="text" placeholder="Email">
+<input id="pass" type="password" placeholder="Password">
+
+<br>
 
 <button onclick="login()">Login</button>
 <button onclick="signup()">Signup</button>
@@ -103,7 +146,6 @@ margin-bottom:10px;
 
 <h2>Welcome 👋</h2>
 
-<!-- Upload -->
 <div class="card">
 
 <h3>Upload Resume</h3>
@@ -112,16 +154,16 @@ margin-bottom:10px;
 
 <label for="file">📄 Choose PDF</label>
 
+<div id="loading"></div>
+
 <br>
 
 <button onclick="analyze()">Analyze Resume</button>
 
 </div>
 
-<!-- Result -->
 <div class="card" id="result"></div>
 
-<!-- HISTORY -->
 <div class="card">
 <h3>📜 History</h3>
 <div id="history"></div>
@@ -131,12 +173,12 @@ margin-bottom:10px;
 
 <script type="module">
 
-/* ================= FIREBASE ================= */
+/* FIREBASE */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } 
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-import { getFirestore, doc, setDoc, getDoc } 
+import { getFirestore, doc, setDoc, getDoc, arrayUnion } 
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -149,9 +191,11 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore();
 
-/* ================= AUTH ================= */
+let textData = "";
+let pdfReady = false;
 
-window.signup = async function(){
+/* SIGNUP */
+window.signup = async () => {
 let email = document.getElementById("email").value;
 let pass = document.getElementById("pass").value;
 
@@ -159,7 +203,8 @@ await createUserWithEmailAndPassword(auth,email,pass);
 alert("Account Created");
 }
 
-window.login = async function(){
+/* LOGIN */
+window.login = async () => {
 let email = document.getElementById("email").value;
 let pass = document.getElementById("pass").value;
 
@@ -171,39 +216,48 @@ document.getElementById("dashboard").style.display="block";
 loadHistory();
 }
 
-window.logout = async function(){
+/* LOGOUT */
+window.logout = async () => {
 await signOut(auth);
 location.reload();
 }
 
-/* ================= PDF ================= */
-let textData="";
+/* PDF READ FIXED */
+document.getElementById("file").addEventListener("change", async (e)=>{
 
-document.getElementById("file").addEventListener("change",async(e)=>{
+let file = e.target.files[0];
+document.getElementById("loading").innerText="Loading PDF... ⏳";
 
-let file=e.target.files[0];
-let reader=new FileReader();
+let reader = new FileReader();
 
-reader.onload=async()=>{
+reader.onload = async () => {
 
-let pdf=await pdfjsLib.getDocument(new Uint8Array(reader.result)).promise;
+let pdf = await pdfjsLib.getDocument(new Uint8Array(reader.result)).promise;
 
-textData="";
+textData = "";
 
 for(let i=1;i<=pdf.numPages;i++){
-let page=await pdf.getPage(i);
-let content=await page.getTextContent();
-textData+=content.items.map(x=>x.str).join(" ");
+let page = await pdf.getPage(i);
+let content = await page.getTextContent();
+textData += content.items.map(x=>x.str).join(" ");
 }
 
-}
+pdfReady = true;
+document.getElementById("loading").innerText="PDF Ready ✅";
+
+};
 
 reader.readAsArrayBuffer(file);
 
 });
 
-/* ================= ANALYZE ================= */
-window.analyze = async function(){
+/* ANALYZE */
+window.analyze = async () => {
+
+if(!pdfReady){
+alert("Wait for PDF to load!");
+return;
+}
 
 let res = await fetch("http://localhost:3000/analyze",{
 method:"POST",
@@ -215,31 +269,31 @@ let data = await res.json();
 
 document.getElementById("result").innerHTML=data.result;
 
-/* SAVE HISTORY */
+/* HISTORY SAVE */
 let user = auth.currentUser;
 
 if(user){
 await setDoc(doc(db,"users",user.email),{
-lastResult:data.result
-});
+history: arrayUnion(data.result)
+},{merge:true});
 }
 
 loadHistory();
 
 }
 
-/* ================= HISTORY ================= */
+/* HISTORY */
 async function loadHistory(){
 
 let user = auth.currentUser;
-
 if(!user) return;
 
 let snap = await getDoc(doc(db,"users",user.email));
 
 if(snap.exists()){
+let data = snap.data().history || [];
 document.getElementById("history").innerHTML =
-snap.data().lastResult;
+data.map(h=>`📄 ${h.slice(0,200)}...`).join("<br><br>");
 }
 
 }
@@ -248,5 +302,3 @@ snap.data().lastResult;
 
 </body>
 </html>
-
-
