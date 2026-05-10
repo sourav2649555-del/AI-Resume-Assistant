@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Resume Assistant</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<!-- Navbar -->
+
+<nav class="navbar">
+
+<div class="logo">
+
+🤖 AI Resume Assistant
+
+</div>
+
+<div class="nav-links">
+
+<a href="#">Home</a>
+
+<a href="#">Features</a>
+
+<a href="#">About</a>
+
+<a href="#">Contact</a>
+
+</div>
+
+</nav>
+
+<!-- Hero Section -->
+
+<section class="hero">
+
+<h1>
+
+AI Resume & Interview Assistant
+
+</h1>
+
+<p>
+
+Analyze resumes, calculate ATS score, and prepare for interviews using AI.
+
+</p>
+
+</section>
+
+<!-- Upload Card -->
+
+<div class="upload-container">
+
+<div class="upload-card">
+
+<h2>Upload Your Resume</h2>
+
+<p>Select PDF Resume File</p>
+
+<input 
+type="file"
+id="resume"
+accept="*/*">
+
+<button onclick="analyzeResume()">
+
+Analyze Resume
+
+</button>
+
+<div id="loading"></div>
+
+</div>
+
+</div>
+
+<!-- Result Section -->
+
+<div id="result"></div>
+
+<!-- Features -->
+
+<section class="features">
+
+<div class="feature-card">
+
+<h3>📄 Resume Analysis</h3>
+
+<p>AI checks resume quality and detects skills.</p>
+
+</div>
+
+<div class="feature-card">
+
+<h3>📊 ATS Score</h3>
+
+<p>Get smart ATS score for placement preparation.</p>
+
+</div>
+
+<div class="feature-card">
+
+<h3>🎤 Interview Questions</h3>
+
+<p>Practice interview questions based on your skills.</p>
+
+</div>
+
+</section>
+
+<!-- Footer -->
+
+<footer>
+
+<p>
+
+© 2026 AI Resume Assistant | Final Year Project
+
+</p>
+
+</footer>
+
+<!-- PDF Reader -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+<!-- Firebase SDK -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<!-- Firebase -->
+
+<script src="firebase.js"></script>
+
+<!-- JavaScript -->
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
