@@ -1,161 +1,296 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AI Resume Assistant</title>
-
-<link rel="stylesheet" href="style.css">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>AI Resume Assistant Pro</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+<style>
+
+/* ===== BASIC RESET ===== */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#0f172a,#111827,#1e293b);
+color:white;
+min-height:100vh;
+}
+
+/* ===== NAVBAR ===== */
+nav{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 8%;
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(10px);
+}
+
+nav .logo{
+font-size:24px;
+font-weight:700;
+color:#ff4da6;
+}
+
+nav a{
+color:white;
+margin-left:20px;
+text-decoration:none;
+opacity:0.8;
+}
+
+nav a:hover{
+color:#ff4da6;
+}
+
+/* ===== HERO ===== */
+.hero{
+text-align:center;
+padding:60px 20px;
+}
+
+.hero h1{
+font-size:50px;
+background:linear-gradient(to right,#ff4da6,#00ffee);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.hero p{
+margin-top:10px;
+opacity:0.8;
+}
+
+/* ===== UPLOAD BOX ===== */
+.container{
+max-width:600px;
+margin:40px auto;
+padding:30px;
+background:rgba(255,255,255,0.05);
+border-radius:20px;
+text-align:center;
+backdrop-filter:blur(15px);
+box-shadow:0 0 20px rgba(255,255,255,0.1);
+}
+
+/* hide file input */
+input[type="file"]{
+display:none;
+}
+
+/* custom upload button */
+.upload-label{
+display:inline-block;
+padding:15px 25px;
+border-radius:12px;
+border:2px dashed #ff4da6;
+cursor:pointer;
+transition:0.3s;
+margin-bottom:20px;
+}
+
+.upload-label:hover{
+background:#ff4da6;
+transform:scale(1.05);
+}
+
+/* button */
+button{
+padding:15px 30px;
+border:none;
+border-radius:12px;
+background:linear-gradient(45deg,#ff004c,#ff4da6);
+color:white;
+font-size:18px;
+cursor:pointer;
+transition:0.3s;
+margin-top:10px;
+}
+
+button:hover{
+transform:scale(1.05);
+}
+
+/* ===== RESULT ===== */
+#result{
+max-width:800px;
+margin:40px auto;
+padding:30px;
+background:rgba(255,255,255,0.05);
+border-radius:20px;
+display:none;
+backdrop-filter:blur(15px);
+}
+
+.score{
+font-size:40px;
+text-align:center;
+color:#00ff99;
+margin:20px 0;
+}
+
+.section{
+margin-top:20px;
+}
+
+.section h3{
+color:#00ffee;
+margin-bottom:10px;
+}
+
+/* ===== FOOTER ===== */
+footer{
+text-align:center;
+padding:20px;
+opacity:0.6;
+margin-top:40px;
+}
+
+</style>
 
 </head>
 
 <body>
 
-<!-- Navbar -->
+<!-- NAVBAR -->
+<nav>
+<div class="logo">🤖 AI Resume Assistant</div>
 
-<nav class="navbar">
-
-<div class="logo">
-
-🤖 AI Resume Assistant
-
-</div>
-
-<div class="nav-links">
-
+<div>
 <a href="#">Home</a>
-
 <a href="#">Features</a>
-
 <a href="#">About</a>
-
-<a href="#">Contact</a>
-
 </div>
-
 </nav>
 
-<!-- Hero Section -->
-
+<!-- HERO -->
 <section class="hero">
-
-<h1>
-
-AI Resume & Interview Assistant
-
-</h1>
-
-<p>
-
-Analyze resumes, calculate ATS score, and prepare for interviews using AI.
-
-</p>
-
+<h1>AI Resume Analyzer</h1>
+<p>Upload your resume and get AI ATS score + feedback</p>
 </section>
 
-<!-- Upload Card -->
+<!-- UPLOAD BOX -->
+<div class="container">
 
-<div class="upload-container">
+<h2>Upload Resume</h2>
+<p>Only PDF supported</p>
 
-<div class="upload-card">
+<input type="file" id="file" accept=".pdf">
 
-<h2>Upload Your Resume</h2>
+<label for="file" class="upload-label">
+📄 Choose Resume
+</label>
 
-<p>Select PDF Resume File</p>
+<br>
 
-<input 
-type="file"
-id="resume"
-accept="*/*">
-
-<button onclick="analyzeResume()">
-
-Analyze Resume
-
-</button>
-
-<div id="loading"></div>
+<button onclick="analyze()">Analyze Resume</button>
 
 </div>
 
-</div>
-
-<!-- Result Section -->
-
+<!-- RESULT -->
 <div id="result"></div>
 
-<!-- Features -->
-
-<section class="features">
-
-<div class="feature-card">
-
-<h3>📄 Resume Analysis</h3>
-
-<p>AI checks resume quality and detects skills.</p>
-
-</div>
-
-<div class="feature-card">
-
-<h3>📊 ATS Score</h3>
-
-<p>Get smart ATS score for placement preparation.</p>
-
-</div>
-
-<div class="feature-card">
-
-<h3>🎤 Interview Questions</h3>
-
-<p>Practice interview questions based on your skills.</p>
-
-</div>
-
-</section>
-
-<!-- Footer -->
-
+<!-- FOOTER -->
 <footer>
-
-<p>
-
-© 2026 AI Resume Assistant | Final Year Project
-
-</p>
-
+© 2026 AI Resume Assistant
 </footer>
 
-<!-- PDF Reader -->
+<script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+let textData = "";
 
-<!-- Firebase SDK -->
+// READ PDF
+document.getElementById("file").addEventListener("change", async function(e){
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+let file = e.target.files[0];
+if(!file) return;
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+let reader = new FileReader();
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+reader.onload = async function(){
 
-<!-- Firebase -->
+let typedarray = new Uint8Array(this.result);
 
-<script src="firebase.js"></script>
+let pdf = await pdfjsLib.getDocument(typedarray).promise;
 
-<!-- JavaScript -->
+textData = "";
 
-<script src="script.js"></script>
+for(let i=1;i<=pdf.numPages;i++){
+let page = await pdf.getPage(i);
+let content = await page.getTextContent();
+textData += content.items.map(item => item.str).join(" ") + " ";
+}
+
+};
+
+reader.readAsArrayBuffer(file);
+
+});
+
+// ANALYZE FUNCTION
+async function analyze(){
+
+if(!textData){
+alert("Please upload resume first!");
+return;
+}
+
+// simple ATS score logic
+let score = 50;
+
+let keywords = ["html","css","javascript","react","project","experience","skills"];
+
+keywords.forEach(k=>{
+if(textData.toLowerCase().includes(k)){
+score += 5;
+}
+});
+
+if(textData.length > 1000) score += 10;
+
+if(score > 100) score = 100;
+
+// show result
+document.getElementById("result").style.display="block";
+
+document.getElementById("result").innerHTML = `
+
+<h2>📊 AI Resume Report</h2>
+
+<div class="score">${score}/100 ATS Score</div>
+
+<div class="section">
+<h3>📌 Summary</h3>
+<p>${score > 80 ? "Strong Resume 🔥" : "Needs Improvement ⚠️"}</p>
+</div>
+
+<div class="section">
+<h3>💡 Suggestions</h3>
+<p>Add more projects, skills, and achievements for better ATS ranking.</p>
+</div>
+
+<div class="section">
+<h3>📄 Preview</h3>
+<p>${textData.slice(0,300)}...</p>
+</div>
+
+`;
+
+}
+
+</script>
 
 </body>
-
 </html>
