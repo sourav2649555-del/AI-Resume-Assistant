@@ -2,43 +2,49 @@ function generateATS(){
 
 let score = Math.floor(Math.random() * 30) + 70;
 
-let role = "";
-
-let comment = "";
-
-if(score >= 90){
-
-role = "Full Stack Developer";
-
-comment = "Excellent resume with strong technical skills.";
+return score;
 
 }
 
-else if(score >= 80){
+function detectSkills(text){
 
-role = "Frontend Developer";
+const skills = [
 
-comment = "Good resume but add more projects.";
+"HTML",
+"CSS",
+"JavaScript",
+"Python",
+"Java",
+"C++",
+"React",
+"Node.js",
+"Firebase",
+"MySQL",
+"MongoDB",
+"AI",
+"Machine Learning"
+
+];
+
+let foundSkills = [];
+
+skills.forEach(skill => {
+
+if(text.toLowerCase().includes(skill.toLowerCase())){
+
+foundSkills.push(skill);
 
 }
 
-else{
+});
 
-role = "Junior Web Developer";
+if(foundSkills.length === 0){
 
-comment = "Improve resume formatting and add certifications.";
+foundSkills.push("No major skills detected");
 
 }
 
-return {
-
-score: score,
-
-role: role,
-
-comment: comment
-
-};
+return foundSkills;
 
 }
 
@@ -57,19 +63,25 @@ return;
 
 }
 
-const fileName = fileInput.files[0].name;
+const file = fileInput.files[0];
 
-result.innerHTML = `
+const reader = new FileReader();
 
-<h2>Analyzing Resume...</h2>
+reader.onload = function(e){
 
-<p>Please wait...</p>
+const text = e.target.result;
 
-`;
+const detectedSkills = detectSkills(text);
 
-setTimeout(() => {
+const score = generateATS();
 
-const data = generateATS();
+let skillsHTML = "";
+
+detectedSkills.forEach(skill => {
+
+skillsHTML += `<p>${skill}</p>`;
+
+});
 
 result.innerHTML = `
 
@@ -77,19 +89,13 @@ result.innerHTML = `
 
 <p>✅ Resume Uploaded Successfully</p>
 
-<p><b>File Name:</b> ${fileName}</p>
+<p><b>File Name:</b> ${file.name}</p>
 
-<p>✅ Skills Found:</p>
+<p>✅ Skills Detected:</p>
 
 <div class="skills">
 
-<p>HTML</p>
-
-<p>CSS</p>
-
-<p>JavaScript</p>
-
-<p>Firebase</p>
+${skillsHTML}
 
 </div>
 
@@ -97,9 +103,9 @@ result.innerHTML = `
 
 <div class="progress-bar">
 
-<div class="progress" style="width:${data.score}%">
+<div class="progress" style="width:${score}%">
 
-${data.score}%
+${score}%
 
 </div>
 
@@ -107,14 +113,12 @@ ${data.score}%
 
 <p>✅ Suggested Role:</p>
 
-<p><b>${data.role}</b></p>
-
-<p>✅ AI Feedback:</p>
-
-<p>${data.comment}</p>
+<p><b>Frontend Developer</b></p>
 
 `;
 
-}, 2000);
+};
+
+reader.readAsText(file);
 
 }
