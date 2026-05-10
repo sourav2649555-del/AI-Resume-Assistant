@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AI Resume Assistant Pro</title>
+<title>AI Resume SaaS</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -14,148 +13,62 @@
 
 <style>
 
-/* ===== BASIC RESET ===== */
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Poppins',sans-serif;
-}
-
+/* ===== BASIC UI ===== */
 body{
-background:linear-gradient(135deg,#0f172a,#111827,#1e293b);
+margin:0;
+font-family:Poppins;
+background:#0f172a;
 color:white;
-min-height:100vh;
 }
 
-/* ===== NAVBAR ===== */
 nav{
 display:flex;
 justify-content:space-between;
-align-items:center;
-padding:20px 8%;
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(10px);
-}
-
-nav .logo{
-font-size:24px;
-font-weight:700;
-color:#ff4da6;
-}
-
-nav a{
-color:white;
-margin-left:20px;
-text-decoration:none;
-opacity:0.8;
-}
-
-nav a:hover{
-color:#ff4da6;
-}
-
-/* ===== HERO ===== */
-.hero{
-text-align:center;
-padding:60px 20px;
-}
-
-.hero h1{
-font-size:50px;
-background:linear-gradient(to right,#ff4da6,#00ffee);
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-}
-
-.hero p{
-margin-top:10px;
-opacity:0.8;
-}
-
-/* ===== UPLOAD BOX ===== */
-.container{
-max-width:600px;
-margin:40px auto;
-padding:30px;
-background:rgba(255,255,255,0.05);
-border-radius:20px;
-text-align:center;
-backdrop-filter:blur(15px);
-box-shadow:0 0 20px rgba(255,255,255,0.1);
-}
-
-/* hide file input */
-input[type="file"]{
-display:none;
-}
-
-/* custom upload button */
-.upload-label{
-display:inline-block;
-padding:15px 25px;
-border-radius:12px;
-border:2px dashed #ff4da6;
-cursor:pointer;
-transition:0.3s;
-margin-bottom:20px;
-}
-
-.upload-label:hover{
-background:#ff4da6;
-transform:scale(1.05);
-}
-
-/* button */
-button{
 padding:15px 30px;
+background:rgba(255,255,255,0.05);
+}
+
+button{
+padding:10px 20px;
 border:none;
-border-radius:12px;
-background:linear-gradient(45deg,#ff004c,#ff4da6);
-color:white;
-font-size:18px;
+border-radius:10px;
 cursor:pointer;
-transition:0.3s;
-margin-top:10px;
+background:#ff4da6;
+color:white;
 }
 
-button:hover{
-transform:scale(1.05);
-}
-
-/* ===== RESULT ===== */
-#result{
-max-width:800px;
-margin:40px auto;
+/* LOGIN */
+#loginBox{
+max-width:400px;
+margin:100px auto;
 padding:30px;
 background:rgba(255,255,255,0.05);
-border-radius:20px;
+border-radius:15px;
+text-align:center;
+}
+
+/* DASHBOARD */
+#dashboard{
 display:none;
-backdrop-filter:blur(15px);
-}
-
-.score{
-font-size:40px;
-text-align:center;
-color:#00ff99;
-margin:20px 0;
-}
-
-.section{
-margin-top:20px;
-}
-
-.section h3{
-color:#00ffee;
-margin-bottom:10px;
-}
-
-/* ===== FOOTER ===== */
-footer{
-text-align:center;
 padding:20px;
-opacity:0.6;
-margin-top:40px;
+}
+
+.card{
+background:rgba(255,255,255,0.05);
+padding:20px;
+margin:20px 0;
+border-radius:15px;
+}
+
+/* UPLOAD */
+input[type=file]{display:none;}
+
+label{
+padding:12px 20px;
+border:2px dashed #ff4da6;
+display:inline-block;
+cursor:pointer;
+margin-bottom:10px;
 }
 
 </style>
@@ -164,34 +77,40 @@ margin-top:40px;
 
 <body>
 
-<!-- NAVBAR -->
+<!-- NAV -->
 <nav>
-<div class="logo">🤖 AI Resume Assistant</div>
-
+<div>🤖 AI SaaS</div>
 <div>
-<a href="#">Home</a>
-<a href="#">Features</a>
-<a href="#">About</a>
+<button onclick="logout()">Logout</button>
 </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-<h1>AI Resume Analyzer</h1>
-<p>Upload your resume and get AI ATS score + feedback</p>
-</section>
+<!-- LOGIN -->
+<div id="loginBox">
 
-<!-- UPLOAD BOX -->
-<div class="container">
+<h2>Login</h2>
 
-<h2>Upload Resume</h2>
-<p>Only PDF supported</p>
+<input id="email" placeholder="Email"><br><br>
+<input id="pass" type="password" placeholder="Password"><br><br>
 
-<input type="file" id="file" accept=".pdf">
+<button onclick="login()">Login</button>
+<button onclick="signup()">Signup</button>
 
-<label for="file" class="upload-label">
-📄 Choose Resume
-</label>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+
+<h2>Welcome 👋</h2>
+
+<!-- Upload -->
+<div class="card">
+
+<h3>Upload Resume</h3>
+
+<input type="file" id="file">
+
+<label for="file">📄 Choose PDF</label>
 
 <br>
 
@@ -199,94 +118,129 @@ margin-top:40px;
 
 </div>
 
-<!-- RESULT -->
-<div id="result"></div>
+<!-- Result -->
+<div class="card" id="result"></div>
 
-<!-- FOOTER -->
-<footer>
-© 2026 AI Resume Assistant
-</footer>
+<!-- HISTORY -->
+<div class="card">
+<h3>📜 History</h3>
+<div id="history"></div>
+</div>
 
-<script>
+</div>
 
-let textData = "";
+<script type="module">
 
-// READ PDF
-document.getElementById("file").addEventListener("change", async function(e){
+/* ================= FIREBASE ================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-let file = e.target.files[0];
-if(!file) return;
+import { getFirestore, doc, setDoc, getDoc } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-let reader = new FileReader();
+const firebaseConfig = {
+apiKey: "YOUR_KEY",
+authDomain: "YOUR_DOMAIN",
+projectId: "YOUR_ID"
+};
 
-reader.onload = async function(){
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const db = getFirestore();
 
-let typedarray = new Uint8Array(this.result);
+/* ================= AUTH ================= */
 
-let pdf = await pdfjsLib.getDocument(typedarray).promise;
+window.signup = async function(){
+let email = document.getElementById("email").value;
+let pass = document.getElementById("pass").value;
 
-textData = "";
-
-for(let i=1;i<=pdf.numPages;i++){
-let page = await pdf.getPage(i);
-let content = await page.getTextContent();
-textData += content.items.map(item => item.str).join(" ") + " ";
+await createUserWithEmailAndPassword(auth,email,pass);
+alert("Account Created");
 }
 
-};
+window.login = async function(){
+let email = document.getElementById("email").value;
+let pass = document.getElementById("pass").value;
+
+await signInWithEmailAndPassword(auth,email,pass);
+
+document.getElementById("loginBox").style.display="none";
+document.getElementById("dashboard").style.display="block";
+
+loadHistory();
+}
+
+window.logout = async function(){
+await signOut(auth);
+location.reload();
+}
+
+/* ================= PDF ================= */
+let textData="";
+
+document.getElementById("file").addEventListener("change",async(e)=>{
+
+let file=e.target.files[0];
+let reader=new FileReader();
+
+reader.onload=async()=>{
+
+let pdf=await pdfjsLib.getDocument(new Uint8Array(reader.result)).promise;
+
+textData="";
+
+for(let i=1;i<=pdf.numPages;i++){
+let page=await pdf.getPage(i);
+let content=await page.getTextContent();
+textData+=content.items.map(x=>x.str).join(" ");
+}
+
+}
 
 reader.readAsArrayBuffer(file);
 
 });
 
-// ANALYZE FUNCTION
-async function analyze(){
+/* ================= ANALYZE ================= */
+window.analyze = async function(){
 
-if(!textData){
-alert("Please upload resume first!");
-return;
-}
-
-// simple ATS score logic
-let score = 50;
-
-let keywords = ["html","css","javascript","react","project","experience","skills"];
-
-keywords.forEach(k=>{
-if(textData.toLowerCase().includes(k)){
-score += 5;
-}
+let res = await fetch("http://localhost:3000/analyze",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({text:textData})
 });
 
-if(textData.length > 1000) score += 10;
+let data = await res.json();
 
-if(score > 100) score = 100;
+document.getElementById("result").innerHTML=data.result;
 
-// show result
-document.getElementById("result").style.display="block";
+/* SAVE HISTORY */
+let user = auth.currentUser;
 
-document.getElementById("result").innerHTML = `
+if(user){
+await setDoc(doc(db,"users",user.email),{
+lastResult:data.result
+});
+}
 
-<h2>📊 AI Resume Report</h2>
+loadHistory();
 
-<div class="score">${score}/100 ATS Score</div>
+}
 
-<div class="section">
-<h3>📌 Summary</h3>
-<p>${score > 80 ? "Strong Resume 🔥" : "Needs Improvement ⚠️"}</p>
-</div>
+/* ================= HISTORY ================= */
+async function loadHistory(){
 
-<div class="section">
-<h3>💡 Suggestions</h3>
-<p>Add more projects, skills, and achievements for better ATS ranking.</p>
-</div>
+let user = auth.currentUser;
 
-<div class="section">
-<h3>📄 Preview</h3>
-<p>${textData.slice(0,300)}...</p>
-</div>
+if(!user) return;
 
-`;
+let snap = await getDoc(doc(db,"users",user.email));
+
+if(snap.exists()){
+document.getElementById("history").innerHTML =
+snap.data().lastResult;
+}
 
 }
 
@@ -294,3 +248,5 @@ document.getElementById("result").innerHTML = `
 
 </body>
 </html>
+
+
