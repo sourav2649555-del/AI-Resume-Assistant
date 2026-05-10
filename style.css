@@ -107,6 +107,10 @@ gap:20px;
 
 /* File Upload */
 
+input[type="file"]{
+display:none;
+}
+
 .custom-file-upload{
 padding:15px 30px;
 border-radius:15px;
@@ -115,15 +119,14 @@ cursor:pointer;
 transition:0.3s;
 border:2px dashed #ff4da6;
 font-size:18px;
+display:inline-block;
+box-shadow:0 0 20px rgba(255,255,255,0.05);
 }
 
 .custom-file-upload:hover{
 transform:scale(1.05);
 background:#ff4da6;
-}
-
-input[type="file"]{
-display:none;
+box-shadow:0 0 25px rgba(255,77,166,0.6);
 }
 
 /* Buttons */
@@ -355,6 +358,7 @@ width:90%;
 
 .custom-file-upload{
 width:90%;
+text-align:center;
 }
 
 }
