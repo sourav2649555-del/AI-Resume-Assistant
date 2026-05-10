@@ -48,28 +48,41 @@ return foundSkills;
 
 }
 
-function analyzeResume(){
-
-const fileInput = document.getElementById("resume");
-
-const result = document.getElementById("result");
-
-if(fileInput.files.length === 0){
-
-result.innerHTML =
-"<p>Please upload a resume first.</p>";
-
-return;
-
-}
-
-const file = fileInput.files[0];
+async function extractPDFText(file){
 
 const reader = new FileReader();
 
-reader.onload = function(e){
+reader.readAsArrayBuffer(file);
 
-const text = e.target.result;
+reader.onload = async function(){
+
+const typedArray = new Uint8Array(reader.result);
+
+const pdf = await pdfjsLib.getDocument(typedArray).promise;
+
+let fullText = "";
+
+for(let i = 1; i <= pdf.numPages; i++){
+
+const page = await pdf.getPage(i);
+
+const content = await page.getTextContent();
+
+const strings = content.items.map(item => item.str);
+
+fullText += strings.join(" ");
+
+}
+
+showAnalysis(fullText, file.name);
+
+};
+
+}
+
+function showAnalysis(text, fileName){
+
+const result = document.getElementById("result");
 
 const detectedSkills = detectSkills(text);
 
@@ -89,7 +102,7 @@ result.innerHTML = `
 
 <p>✅ Resume Uploaded Successfully</p>
 
-<p><b>File Name:</b> ${file.name}</p>
+<p><b>File Name:</b> ${fileName}</p>
 
 <p>✅ Skills Detected:</p>
 
@@ -117,8 +130,33 @@ ${score}%
 
 `;
 
-};
+}
 
-reader.readAsText(file);
+function analyzeResume(){
+
+const fileInput = document.getElementById("resume");
+
+const result = document.getElementById("result");
+
+if(fileInput.files.length === 0){
+
+result.innerHTML =
+"<p>Please upload a PDF resume first.</p>";
+
+return;
+
+}
+
+const file = fileInput.files[0];
+
+result.innerHTML = `
+
+<h2>Analyzing Resume...</h2>
+
+<p>Please wait...</p>
+
+`;
+
+extractPDFText(file);
 
 }
