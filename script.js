@@ -1,35 +1,106 @@
-import express from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
-import dotenv from "dotenv";
-import OpenAI from "openai";
+const themeToggle = document.getElementById('themeToggle');
 
-dotenv.config();
+let darkMode = true;
 
-const app = express();
-app.use(cors());
-app.use(bodyParser.json());
+themeToggle.addEventListener('click', () => {
 
-const ai = new OpenAI({
-apiKey: process.env.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
+    document.body.classList.toggle('light-mode');
+
+    darkMode = !darkMode;
+
+    themeToggle.innerHTML = darkMode ? '🌙' : '☀️';
 });
 
-app.post("/analyze", async (req,res)=>{
+function generateResume() {
 
-let text=req.body.text;
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const skills = document.getElementById('skills').value;
+    const summary = document.getElementById('summary').value;
+    const experience = document.getElementById('experience').value;
+    const education = document.getElementById('education').value;
 
-let response = await ai.chat.completions.create({
-model:"gpt-4o-mini",
-messages:[
-{role:"system",content:"You are a resume expert. Give ATS score, strengths, weaknesses, improvements and interview questions."},
-{role:"user",content:text}
-]
+    const preview = document.getElementById('resumePreview');
+
+    preview.innerHTML = `
+
+        <h1>${name}</h1>
+
+        <p>${email} | ${phone}</p>
+
+        <hr>
+
+        <h2>Professional Summary</h2>
+        <p>${summary}</p>
+
+        <h2>Skills</h2>
+        <p>${skills}</p>
+
+        <h2>Experience</h2>
+        <p>${experience}</p>
+
+        <h2>Education</h2>
+        <p>${education}</p>
+
+    `;
+
+    calculateATS(skills, summary, experience);
+
+    generateAISuggestions(summary, experience);
+}
+
+function calculateATS(skills, summary, experience) {
+
+    let score = 50;
+
+    if(skills.length > 20) score += 20;
+    if(summary.length > 50) score += 15;
+    if(experience.length > 50) score += 15;
+
+    if(score > 100) score = 100;
+
+    document.getElementById('atsScore').innerText = score + '%';
+}
+
+function generateAISuggestions(summary, experience) {
+
+    const suggestions = document.getElementById('suggestions');
+
+    suggestions.innerHTML = '';
+
+    if(summary.length < 50) {
+        suggestions.innerHTML += '<li>Improve professional summary.</li>';
+    }
+
+    if(experience.length < 80) {
+        suggestions.innerHTML += '<li>Add more detailed work experience.</li>';
+    }
+
+    suggestions.innerHTML += '<li>Add quantified achievements.</li>';
+    suggestions.innerHTML += '<li>Use ATS-friendly keywords.</li>';
+}
+
+async function downloadPDF() {
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF();
+
+    const content = document.getElementById('resumePreview').innerText;
+
+    doc.text(content, 10, 10);
+
+    doc.save('resume.pdf');
+}
+
+const uploadInput = document.getElementById('resumeUpload');
+
+uploadInput.addEventListener('change', (e) => {
+
+    const file = e.target.files[0];
+
+    if(file) {
+        alert(`Uploaded: ${file.name}`);
+    }
 });
-
-res.json({
-result:response.choices[0].message.content
-});
-
-});
-
-app.listen(3000,()=>console.log("Server running"));
