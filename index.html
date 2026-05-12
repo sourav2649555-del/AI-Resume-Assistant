@@ -1,304 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Assistant Pro</title>
 
-<title>AI Resume SaaS Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-
-<style>
-
-/* ===== BASE ===== */
-body{
-margin:0;
-font-family:Poppins;
-background:#0f172a;
-color:white;
-}
-
-/* NAV */
-nav{
-display:flex;
-justify-content:space-between;
-padding:15px 30px;
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(10px);
-}
-
-/* BUTTON */
-button{
-padding:10px 20px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-background:#ff4da6;
-color:white;
-}
-
-/* LOGIN BOX FIX */
-#loginBox{
-max-width:400px;
-margin:100px auto;
-padding:30px;
-background:rgba(255,255,255,0.08);
-border-radius:15px;
-text-align:center;
-backdrop-filter:blur(10px);
-box-shadow:0 0 20px rgba(255,255,255,0.1);
-position:relative;
-z-index:1;
-}
-
-/* INPUT FIX (MAIN BUG FIX) */
-#loginBox input{
-width:90%;
-padding:12px;
-margin:10px 0;
-border-radius:10px;
-border:none;
-outline:none;
-background:#1e293b;
-color:white;
-font-size:16px;
-position:relative;
-z-index:10;
-pointer-events:auto;
-}
-
-#loginBox input:focus{
-border:2px solid #ff4da6;
-transform:scale(1.02);
-transition:0.2s;
-}
-
-/* DASHBOARD */
-#dashboard{
-display:none;
-padding:20px;
-}
-
-/* CARD */
-.card{
-background:rgba(255,255,255,0.05);
-padding:20px;
-margin:20px 0;
-border-radius:15px;
-backdrop-filter:blur(10px);
-}
-
-/* FILE INPUT */
-input[type=file]{
-display:none;
-}
-
-label{
-padding:12px 20px;
-border:2px dashed #ff4da6;
-display:inline-block;
-cursor:pointer;
-margin-bottom:10px;
-border-radius:10px;
-}
-
-#loading{
-margin-top:10px;
-color:#00ffee;
-}
-
-#result{
-white-space:pre-wrap;
-}
-
-</style>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
-
 <body>
 
-<!-- NAV -->
-<nav>
-<div>🤖 AI SaaS Pro</div>
-<button onclick="logout()">Logout</button>
-</nav>
+<div class="background"></div>
 
-<!-- LOGIN -->
-<div id="loginBox">
+<header>
+    <h1>AI Resume Assistant</h1>
 
-<h2>Login</h2>
+    <button id="themeToggle">🌙</button>
+</header>
 
-<input id="email" type="text" placeholder="Email">
-<input id="pass" type="password" placeholder="Password">
+<section class="hero">
 
-<br>
+    <div class="glass-card form-section">
 
-<button onclick="login()">Login</button>
-<button onclick="signup()">Signup</button>
+        <h2>Create Your Resume</h2>
 
-</div>
+        <input type="text" id="name" placeholder="Full Name">
+        <input type="email" id="email" placeholder="Email">
+        <input type="text" id="phone" placeholder="Phone Number">
+        <input type="text" id="skills" placeholder="Skills (comma separated)">
 
-<!-- DASHBOARD -->
-<div id="dashboard">
+        <textarea id="summary" placeholder="Professional Summary"></textarea>
 
-<h2>Welcome 👋</h2>
+        <textarea id="experience" placeholder="Experience"></textarea>
 
-<div class="card">
+        <textarea id="education" placeholder="Education"></textarea>
 
-<h3>Upload Resume</h3>
+        <button onclick="generateResume()">Generate Resume</button>
 
-<input type="file" id="file">
+        <button onclick="downloadPDF()">Download PDF</button>
 
-<label for="file">📄 Choose PDF</label>
+    </div>
 
-<div id="loading"></div>
+    <div class="glass-card preview-section">
 
-<br>
+        <h2>Resume Preview</h2>
 
-<button onclick="analyze()">Analyze Resume</button>
+        <div id="resumePreview"></div>
 
-</div>
+    </div>
 
-<div class="card" id="result"></div>
+</section>
 
-<div class="card">
-<h3>📜 History</h3>
-<div id="history"></div>
-</div>
+<section class="dashboard">
 
-</div>
+    <div class="glass-card stats-card">
+        <h3>ATS Score</h3>
+        <div id="atsScore">0%</div>
+    </div>
 
-<script type="module">
+    <div class="glass-card stats-card">
+        <h3>AI Suggestions</h3>
+        <ul id="suggestions">
+            <li>Add more measurable achievements.</li>
+        </ul>
+    </div>
 
-/* FIREBASE */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    <div class="glass-card stats-card">
+        <h3>Job Match</h3>
+        <div id="jobMatch">85%</div>
+    </div>
 
-import { getFirestore, doc, setDoc, getDoc, arrayUnion } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+</section>
 
-const firebaseConfig = {
-apiKey: "YOUR_KEY",
-authDomain: "YOUR_DOMAIN",
-projectId: "YOUR_ID"
-};
+<section class="upload-section glass-card">
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth();
-const db = getFirestore();
+    <h2>Upload Existing Resume</h2>
 
-let textData = "";
-let pdfReady = false;
+    <input type="file" id="resumeUpload">
 
-/* SIGNUP */
-window.signup = async () => {
-let email = document.getElementById("email").value;
-let pass = document.getElementById("pass").value;
+</section>
 
-await createUserWithEmailAndPassword(auth,email,pass);
-alert("Account Created");
-}
-
-/* LOGIN */
-window.login = async () => {
-let email = document.getElementById("email").value;
-let pass = document.getElementById("pass").value;
-
-await signInWithEmailAndPassword(auth,email,pass);
-
-document.getElementById("loginBox").style.display="none";
-document.getElementById("dashboard").style.display="block";
-
-loadHistory();
-}
-
-/* LOGOUT */
-window.logout = async () => {
-await signOut(auth);
-location.reload();
-}
-
-/* PDF READ FIXED */
-document.getElementById("file").addEventListener("change", async (e)=>{
-
-let file = e.target.files[0];
-document.getElementById("loading").innerText="Loading PDF... ⏳";
-
-let reader = new FileReader();
-
-reader.onload = async () => {
-
-let pdf = await pdfjsLib.getDocument(new Uint8Array(reader.result)).promise;
-
-textData = "";
-
-for(let i=1;i<=pdf.numPages;i++){
-let page = await pdf.getPage(i);
-let content = await page.getTextContent();
-textData += content.items.map(x=>x.str).join(" ");
-}
-
-pdfReady = true;
-document.getElementById("loading").innerText="PDF Ready ✅";
-
-};
-
-reader.readAsArrayBuffer(file);
-
-});
-
-/* ANALYZE */
-window.analyze = async () => {
-
-if(!pdfReady){
-alert("Wait for PDF to load!");
-return;
-}
-
-let res = await fetch("http://localhost:3000/analyze",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({text:textData})
-});
-
-let data = await res.json();
-
-document.getElementById("result").innerHTML=data.result;
-
-/* HISTORY SAVE */
-let user = auth.currentUser;
-
-if(user){
-await setDoc(doc(db,"users",user.email),{
-history: arrayUnion(data.result)
-},{merge:true});
-}
-
-loadHistory();
-
-}
-
-/* HISTORY */
-async function loadHistory(){
-
-let user = auth.currentUser;
-if(!user) return;
-
-let snap = await getDoc(doc(db,"users",user.email));
-
-if(snap.exists()){
-let data = snap.data().history || [];
-document.getElementById("history").innerHTML =
-data.map(h=>`📄 ${h.slice(0,200)}...`).join("<br><br>");
-}
-
-}
-
-</script>
+<script src="app.js"></script>
 
 </body>
 </html>
