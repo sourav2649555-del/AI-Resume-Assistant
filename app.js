@@ -1,3 +1,4 @@
+alert("App JS Connected");
 const themeToggle = document.getElementById('themeToggle');
 
 let darkMode = true;
